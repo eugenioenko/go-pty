@@ -12,6 +12,10 @@ Go-Pty is a package for using pseudo-terminal interfaces in Go. It supports Unix
 
 Windows requires updating the process running in the PTY with a [special attribute](https://learn.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session) to enable ConPty support. This is not possible with os/exec see [go#62708](https://github.com/golang/go/issues/62708) and [go#6271](https://github.com/golang/go/pull/62710). On Unix, `pty.Cmd` is just a wrapper around `os/exec.Cmd` that sets up the PTY.
 
+## Bundled ConPty on Windows
+
+When `conpty.dll` and `OpenConsole.exe` sit next to the running executable, go-pty uses them instead of the ConPty built into Windows. Both files come from Microsoft's [`Microsoft.Windows.Console.ConPTY`](https://www.nuget.org/packages/Microsoft.Windows.Console.ConPTY) package; use the build matching your executable's architecture. The console host in older Windows releases, such as Windows 10, drops mouse-tracking modes, so programs inside the PTY never receive mouse input. If either file is missing or fails to load, go-pty falls back to the system ConPty.
+
 ## Usage
 
 ```sh
