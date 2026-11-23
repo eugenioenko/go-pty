@@ -49,7 +49,7 @@ func newPty() (ConPty, error) {
 
 	var hpc windows.Handle
 	coord := windows.Coord{X: 80, Y: 25}
-	err = windows.CreatePseudoConsole(coord, windows.Handle(ptyIn.Fd()), windows.Handle(ptyOut.Fd()), 0, &hpc)
+	err = createPseudoConsole(coord, windows.Handle(ptyIn.Fd()), windows.Handle(ptyOut.Fd()), 0, &hpc)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pseudo console: %w", err)
 	}
@@ -73,7 +73,7 @@ func (p *conPty) Close() error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 
-	windows.ClosePseudoConsole(p.handle)
+	closePseudoConsole(p.handle)
 	return errors.Join(p.inPipe.Close(), p.outPipe.Close())
 }
 
@@ -114,7 +114,7 @@ func (p *conPty) Read(b []byte) (n int, err error) {
 func (p *conPty) Resize(width int, height int) error {
 	p.mtx.RLock()
 	defer p.mtx.RUnlock()
-	if err := windows.ResizePseudoConsole(p.handle, windows.Coord{X: int16(width), Y: int16(height)}); err != nil {
+	if err := resizePseudoConsole(p.handle, windows.Coord{X: int16(width), Y: int16(height)}); err != nil {
 		return fmt.Errorf("failed to resize pseudo console: %w", err)
 	}
 	return nil
